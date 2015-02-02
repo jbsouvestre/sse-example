@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<style>
+		.message {
+			position: absolute;
+			top: 0;
+			lefT: 0;
+			width: 100%;
+			height: 35px;
+			display: none;
+		}
+
+		#noconnection {
+			background-color: red;
+		}
+
+		#connection {
+			background-color: green;	
+		}
+
+		#messages {
+			margin-top: 35px;
+		}
+		#messages .item {
+			border: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body>
+	
+	<div id="noconnection" class="message">
+		Connection Lost
+	</div>
+	<div id="connection" class="message">
+		Connected !
+	</div>
+	<div id="messages">
+		
+	</div>
+
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+	<script>
+		/*jshint jquery: true*/
+		/*globals EventSource, _*/
+		$(function(){
+
+			'use strict';
+
+			var STREAM_URL = '/stream',
+				$messages = $('#messages'),
+				$noConn = $('#noconnection'),
+				$hasCon = $('#connection');
+
+			var $item = _.template('<div class="item"> <%= data %> </div>');
+
+			var source = new EventSource(STREAM_URL);
+
+			source.addEventListener('message', function(e){
+				$messages.append( $item({data: e.data}));
+			}, false);	
+
+			source.addEventListener('open', function(){
+				$noConn.slideUp();
+				$hasCon.slideDown();
+			}, false);
+
+			source.addEventListener('error', function(){
+				$noConn.slideDown();
+				$hasCon.slideUp();
+			}, false);
+		});
+	</script>
+</body>
+</html>
